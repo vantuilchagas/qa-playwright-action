@@ -17,11 +17,30 @@ jobs:
       run: npm ci
     - name: Install Playwright Chromium
       run: npx playwright install --with-deps chromium
-    - name: Run Login Tests - Chromium
-      run: npx playwright test tests/login.spec.js --project=chromium
-    - uses: actions/upload-artifact@v4
+    
+    # Executa os testes Web de login e os testes de API.
+    - name: Run Web and API Tests
+      run: npx playwright test tests/login.spec.js tests/api/posts.spec.js --project=chromium
+
+    
+    # Publica os relatórios e as evidências produzidas pelos testes.
+    - name: Upload Playwright Evidence
+      uses: actions/upload-artifact@v4
+
+      # Executa o upload mesmo quando os testes falharem.
       if: ${{ !cancelled() }}
+
       with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+        # Identifica o pacote de evidências no GitHub Actions.
+        name: playwright-evidence
+
+        # Inclui relatório HTML, vídeos, screenshots e traces.
+        path: |
+          playwright-report/
+          test-results/
+
+        # Avisa caso nenhuma evidência seja encontrada.
+        if-no-files-found: warn
+
+        # Mantém o pacote por sete dias.
+        retention-days: 7
