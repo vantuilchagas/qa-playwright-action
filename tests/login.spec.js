@@ -47,3 +47,18 @@ test('TC-LOGIN-004 - Validar formulário de login', async ({ page }) => {
   await expect(page.locator('#password')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
 });
+//TC-LOGIN-005
+test('TC-LOGIN-005 - Encerrar sessão após login', async ({ page }) => {
+  await page.goto('https://the-internet.herokuapp.com/login');
+
+  await page.locator('#username').fill('tomsmith');
+  await page.locator('#password').fill('SuperSecretPassword!');
+
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  await expect(page).toHaveURL(/\/secure/);
+
+  await page.getByRole('link', { name: 'Logout' }).click();
+
+  await expect(page).toHaveURL(/\/login/);
+});
